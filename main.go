@@ -31,13 +31,17 @@ func GetTodo(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	json.NewEncoder(w).Encode("Todo Not Found...!")
+	http.Error(w, "Todo not found", http.StatusNotFound)
 }
 
 func CreateTodo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var todo Todo
-	json.NewDecoder(r.Body).Decode(&todo)
+	err := json.NewDecoder(r.Body).Decode(&todo)
+	if err != nil {
+		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		return
+	}
 	todo.Id = strconv.Itoa(rand.Intn(10000))
 	todo.Status = "Pending"
 	todoList = append(todoList, todo)
@@ -46,23 +50,20 @@ func CreateTodo(w http.ResponseWriter, r *http.Request) {
 
 func CompleteTodo(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "PATCH" {
-		json.NewEncoder(w).Encode(fmt.Errorf("Invalid method type"))
+		http.Error(w, "Invalid Method", http.StatusMethodNotAllowed)
+		return
 	}
 
 	paramsId := r.PathValue("id")
 
 	for idx, item := range todoList {
 		if item.Id == paramsId {
-			todoList = append(todoList[:idx], todoList[idx+1:]...)
-
-			item.Status = "Completed"
-			todoList = append(todoList, item)
-
-			json.NewEncoder(w).Encode(item)
+			todoList[idx].Status = "Completed"
+			json.NewEncoder(w).Encode(todoList[idx])
 			return
 		}
 	}
-	json.NewEncoder(w).Encode("Todo Not Found...!")
+	http.Error(w, "Todo not found", http.StatusNotFound)
 }
 
 func DeleteTodo(w http.ResponseWriter, r *http.Request) {
@@ -73,14 +74,14 @@ func DeleteTodo(w http.ResponseWriter, r *http.Request) {
 		if item.Id == paramsId {
 			if item.Status == "Completed" {
 				todoList = append(todoList[:idx], todoList[idx+1:]...)
-				json.NewEncoder(w).Encode("Todo deleted successfulyy...!")
+				json.NewEncoder(w).Encode("Todo deleted successfully...!")
 				return
 			}
-			json.NewEncoder(w).Encode("Todo is pending, can't be deleted...!")
+			http.Error(w, "Todo is pending", http.StatusConflict)
 			return
 		}
 	}
-	json.NewEncoder(w).Encode("Todo Not Found...!")
+	http.Error(w, "Todo not found", http.StatusNotFound)
 }
 
 func main() {
@@ -89,10 +90,10 @@ func main() {
 	todoList = append(todoList, Todo{Id: "0002", Description: "Test Todo App", Status: "Pending"})
 
 	http.HandleFunc("GET /todos", GetAllTodos)
-	http.HandleFunc("GET /todo/{id}", GetTodo)
+	http.HandleFunc("GET /todos/{id}", GetTodo)
 	http.HandleFunc("POST /todos", CreateTodo)
-	http.HandleFunc("PATCH /todo/{id}/completed", CompleteTodo)
-	http.HandleFunc("DELETE /todo/{id}", DeleteTodo)
+	http.HandleFunc("PATCH /todos/{id}/completed", CompleteTodo)
+	http.HandleFunc("DELETE /todos/{id}", DeleteTodo)
 
 	fmt.Printf("Starting Todo List server at :8080...!")
 

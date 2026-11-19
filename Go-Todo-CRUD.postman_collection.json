@@ -31,14 +31,14 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/todo/0002",
+          "raw": "http://localhost:8080/todos/0002",
           "protocol": "http",
           "host": [
             "localhost"
           ],
           "port": "8080",
           "path": [
-            "todo",
+            "todos",
             "0002"
           ]
         }
@@ -76,18 +76,18 @@
     {
       "name": "Complete Todo",
       "request": {
-        "method": "PATCH",
+        "method": "PUT",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/todo/8231/completed",
+          "raw": "http://localhost:8080/todos/0001/completed",
           "protocol": "http",
           "host": [
             "localhost"
           ],
           "port": "8080",
           "path": [
-            "todo",
-            "8231",
+            "todos",
+            "0001",
             "completed"
           ]
         }
@@ -100,15 +100,15 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/todo/8231",
+          "raw": "http://localhost:8080/todos/0001",
           "protocol": "http",
           "host": [
             "localhost"
           ],
           "port": "8080",
           "path": [
-            "todo",
-            "8231"
+            "todos",
+            "0001"
           ]
         }
       },
